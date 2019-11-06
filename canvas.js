@@ -7,7 +7,7 @@ const c = canvas.getContext('2d');
 // text colors
 const textColor = 'black';
 const highlightColor =  'red';
-const backgroundColor = '#37566b';
+const backgroundColor = '#000';
 
 // tile color
 const colorLumber = '#739877';
@@ -378,40 +378,46 @@ function Item(start, size, type) {
 
 // ocean
 function Ocean() {
-	this.array = [];
 	this.boundry = [];
 	this.port = []
 	
 	this.generate = function() {
 		// reset
-		this.array = [];
 		this.boundry = [];
 		this.port = [];
 		
-		// find corners
-		this.array.push(boardLayout[0] - 1);
-		this.array.push(0);
-		this.array.push(boardLayout.filter((value, index) => index < boardLayout.indexOf(Math.max(...boardLayout))).reduce((a,b) => a + b, 0));
-		this.array.push(boardLayout.filter((value, index) => index < boardLayout.length - 1).reduce((a,b) => a + b, 0));
-		this.array.push(this.array[this.array.length - 1] + boardLayout[boardLayout.length - 1] - 1);
-		this.array.push(this.array[this.array.length - 3] + boardLayout[boardLayout.indexOf(Math.max(...boardLayout))] - 1);
 		
 		// find bounding hexigon
-		this.array.forEach((value,index) => {
-			let angle = Math.PI/3;
-			let start = board.tiles[value].start;
-			this.boundry.push({
-				x:start.x + size*sqrt3/2 + size*4/sqrt3*Math.cos((-index-1)*angle),
-				y:start.y + size + size*4/sqrt3*Math.sin((-index-1)*angle)
+		board.tiles.forEach(tile => {
+			
+
+			this.boundry.push(() => {
+				const angle = Math.PI/3;
+				const start = tile.start;
+				
+				c.fillStyle = colorWater;
+				c.beginPath();
+				c.moveTo(
+					start.x + size*sqrt3/2 + size*4/sqrt3*Math.cos((0)*angle),
+					start.y + size + size*4/sqrt3*Math.sin((0)*angle)
+				);
+				
+				for(let i = 0; i < 6; i++) {
+					c.lineTo(
+						start.x + size*sqrt3/2 + size*4/sqrt3*Math.cos((-i-1)*angle),
+						start.y + size + size*4/sqrt3*Math.sin((-i-1)*angle)
+					);
+				} // end of for
+				c.fill();
 			});
 		});
 		
 		// generate ports
 		port.forEach(value => {
 			this.port.push(() => {
-				let angle = Math.PI/3
-				let start = board.tiles[value.location].start;
-				let grd = c.createLinearGradient(
+				const angle = Math.PI/3
+				const start = board.tiles[value.location].start;
+				const grd = c.createLinearGradient(
 					start.x + size*sqrt3/2 + size*sqrt3*Math.cos(value.direction*angle),
 					start.y + size + size*sqrt3*Math.sin(value.direction*angle),
 					start.x + size*sqrt3/2 + size*sqrt3/2*Math.cos(value.direction*angle),
@@ -456,14 +462,8 @@ function Ocean() {
 	} // end of generate ocean
 	
 	this.draw = function() {
-		let start = undefined;
-		
 		// draw ocean
-		c.fillStyle = colorWater;
-		c.beginPath();
-		c.moveTo(this.boundry[5].x, this.boundry[5].y);
-		this.boundry.forEach(start => c.lineTo(start.x, start.y));
-		c.fill();
+		this.boundry.forEach(fn => fn());
 		
 		// draw port
 		this.port.forEach(fn => fn());
@@ -716,7 +716,7 @@ function checkMap() {
 	} // end of if
 	
 	// check resource
-	if(numberAmount - resourceAmount) {
+	if(numberAmount < resourceAmount) {
 		numberDist.push(new Array(resourceAmount - numberAmount).fill(12));
 		numberDist = numberDist.flat();
 	} // end of if	
