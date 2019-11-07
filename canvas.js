@@ -387,10 +387,8 @@ function Ocean() {
 		this.port = [];
 		
 		
-		// find bounding hexigon
+		// bounding hexigon
 		board.tiles.forEach(tile => {
-			
-
 			this.boundry.push(() => {
 				const angle = Math.PI/3;
 				const start = tile.start;
@@ -782,14 +780,6 @@ function resizeTile() {
 
 /* EVENT ******************************************************** */
 
-window.addEventListener('click', function(event) {
-	
-}) // end of mouse event listener */
-
-window.addEventListener('touchstart', function(event) {
-	
-}) // end of mouse event listener */
-
 window.addEventListener('resize', function() {
 	init();
 	resizeTile();
@@ -798,8 +788,6 @@ window.addEventListener('resize', function() {
 }) // end of resize event listener
 
 window.addEventListener('keydown', function(event) {
-	//console.log(event);
-	
 	// check key map
 	if(!keyMap.has(event.key)) {
 		return;
